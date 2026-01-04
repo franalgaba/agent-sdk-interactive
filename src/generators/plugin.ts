@@ -1,0 +1,211 @@
+/**
+ * Plugin Generator - Generates Claude Code plugin structure
+ *
+ * Creates a plugin directory with:
+ * - .claude-plugin/plugin.json (manifest)
+ * - commands/*.md (custom commands)
+ * - agents/*.md (custom agents)
+ * - hooks/hooks.json (if hooks defined)
+ */
+
+import * as fs from "fs/promises";
+import * as path from "path";
+import type { ResolvedConfig, AgentDefinition, CommandDefinition } from "../types";
+
+export interface PluginManifest {
+  name: string;
+  version: string;
+  description: string;
+  author?: {
+    name: string;
+  };
+}
+
+/**
+ * Generate a complete plugin in the specified directory
+ */
+export async function generatePlugin(
+  config: ResolvedConfig,
+  pluginDir: string
+): Promise<string[]> {
+  const generatedFiles: string[] = [];
+
+  // Create directories
+  await fs.mkdir(path.join(pluginDir, ".claude-plugin"), { recursive: true });
+
+  // Generate plugin.json manifest
+  const manifest: PluginManifest = {
+    name: config.name,
+    version: "1.0.0",
+    description: `Custom plugin for ${config.name}`,
+  };
+
+  const manifestPath = path.join(pluginDir, ".claude-plugin", "plugin.json");
+  await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
+  generatedFiles.push(manifestPath);
+
+  // Generate commands
+  if (Object.keys(config.commands).length > 0) {
+    await fs.mkdir(path.join(pluginDir, "commands"), { recursive: true });
+
+    for (const [name, command] of Object.entries(config.commands)) {
+      const commandPath = path.join(pluginDir, "commands", `${name}.md`);
+      const content = generateCommandMarkdown(name, command);
+      await fs.writeFile(commandPath, content);
+      generatedFiles.push(commandPath);
+    }
+  }
+
+  // Generate agents
+  if (Object.keys(config.agents).length > 0) {
+    await fs.mkdir(path.join(pluginDir, "agents"), { recursive: true });
+
+    for (const [name, agent] of Object.entries(config.agents)) {
+      const agentPath = path.join(pluginDir, "agents", `${name}.md`);
+      const content = generateAgentMarkdown(name, agent);
+      await fs.writeFile(agentPath, content);
+      generatedFiles.push(agentPath);
+    }
+  }
+
+  // Generate hooks.json if hooks are defined
+  if (Object.keys(config.hooks).length > 0) {
+    await fs.mkdir(path.join(pluginDir, "hooks"), { recursive: true });
+
+    const hooksJson = generateHooksJson(config);
+    const hooksPath = path.join(pluginDir, "hooks", "hooks.json");
+    await fs.writeFile(hooksPath, JSON.stringify(hooksJson, null, 2));
+    generatedFiles.push(hooksPath);
+  }
+
+  // Generate README
+  const readmePath = path.join(pluginDir, "README.md");
+  const readmeContent = generateReadme(config);
+  await fs.writeFile(readmePath, readmeContent);
+  generatedFiles.push(readmePath);
+
+  return generatedFiles;
+}
+
+/**
+ * Generate command markdown file content
+ */
+function generateCommandMarkdown(name: string, command: CommandDefinition): string {
+  const lines: string[] = [];
+
+  // Frontmatter
+  lines.push("---");
+  lines.push(`description: ${command.description}`);
+  if (command.argumentHint) {
+    lines.push(`argument_hint: ${command.argumentHint}`);
+  }
+  if (command.allowedTools && command.allowedTools.length > 0) {
+    lines.push(`allowed_tools: ${command.allowedTools.join(", ")}`);
+  }
+  lines.push("---");
+  lines.push("");
+
+  // Content
+  lines.push(command.content);
+
+  return lines.join("\n");
+}
+
+/**
+ * Generate agent markdown file content
+ */
+function generateAgentMarkdown(name: string, agent: AgentDefinition): string {
+  const lines: string[] = [];
+
+  // Frontmatter
+  lines.push("---");
+  lines.push(`description: ${agent.description}`);
+  if (agent.model && agent.model !== "inherit") {
+    lines.push(`model: ${agent.model}`);
+  }
+  if (agent.tools && agent.tools.length > 0) {
+    lines.push(`tools: ${agent.tools.join(", ")}`);
+  }
+  lines.push("---");
+  lines.push("");
+
+  // System prompt
+  lines.push(agent.prompt);
+
+  return lines.join("\n");
+}
+
+/**
+ * Generate hooks.json content
+ */
+function generateHooksJson(config: ResolvedConfig): Record<string, unknown[]> {
+  const hooks: Record<string, unknown[]> = {};
+
+  for (const [event, matchers] of Object.entries(config.hooks)) {
+    if (!matchers) continue;
+
+    hooks[event] = matchers.map((matcher) => {
+      const hook: Record<string, unknown> = {};
+
+      if (matcher.matcher) {
+        hook.matcher = matcher.matcher;
+      }
+
+      if (matcher.command) {
+        hook.command = matcher.command;
+      }
+
+      // Note: TypeScript handlers can't be serialized to hooks.json
+      // They would need to be converted to shell scripts or removed
+
+      return hook;
+    });
+  }
+
+  return hooks;
+}
+
+/**
+ * Generate README.md content
+ */
+function generateReadme(config: ResolvedConfig): string {
+  const lines: string[] = [];
+
+  lines.push(`# ${config.name}`);
+  lines.push("");
+  lines.push("Custom Claude Code plugin generated by claude-code-interactive SDK.");
+  lines.push("");
+
+  // Commands section
+  if (Object.keys(config.commands).length > 0) {
+    lines.push("## Commands");
+    lines.push("");
+    for (const [name, command] of Object.entries(config.commands)) {
+      lines.push(`- \`/${name}\` - ${command.description}`);
+    }
+    lines.push("");
+  }
+
+  // Agents section
+  if (Object.keys(config.agents).length > 0) {
+    lines.push("## Agents");
+    lines.push("");
+    for (const [name, agent] of Object.entries(config.agents)) {
+      lines.push(`- **${name}** - ${agent.description}`);
+    }
+    lines.push("");
+  }
+
+  return lines.join("\n");
+}
+
+/**
+ * Clean up a generated plugin directory
+ */
+export async function cleanupPlugin(pluginDir: string): Promise<void> {
+  try {
+    await fs.rm(pluginDir, { recursive: true, force: true });
+  } catch {
+    // Ignore cleanup errors
+  }
+}
