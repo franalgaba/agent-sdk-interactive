@@ -1,7 +1,7 @@
 {
-  "name": "@franalgaba/agent-sdk-interactive",
+  "name": "@franalgaba/coding-agent-builder",
   "version": "0.1.0",
-  "description": "TypeScript SDK for building custom CLIs powered by Claude with custom agents, commands, and TUI",
+  "description": "Build custom branded coding agents using Claude Code's harness and Agent SDK. Configure your own AI coding assistant with custom branding, agents, and commands.",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -49,14 +49,14 @@
   "keywords": [
     "claude",
     "claude-code",
+    "coding-agent",
     "agent-sdk",
     "anthropic",
-    "ai",
-    "tui",
-    "cli",
-    "terminal",
-    "agent",
-    "llm"
+    "ai-assistant",
+    "code-assistant",
+    "custom-agent",
+    "branded-ai",
+    "developer-tools"
   ],
   "author": "Anthropic",
   "license": "MIT",
