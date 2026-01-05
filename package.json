@@ -1,5 +1,5 @@
 {
-  "name": "claude-code-interactive",
+  "name": "@franalgaba/agent-sdk-interactive",
   "version": "0.1.0",
   "description": "TypeScript SDK for building custom CLIs powered by Claude with custom agents, commands, and TUI",
   "type": "module",
