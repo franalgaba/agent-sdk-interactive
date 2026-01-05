@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { generateAgentMarkdown, generateAgentFiles } from "./agents";
-import type { AgentDefinition } from "../types";
+import { generateAgentMarkdown, generateAgentFiles } from "../../src/generators/agents";
+import type { AgentDefinition } from "../../src/types";
 
 describe("generateAgentMarkdown", () => {
   test("generates minimal agent markdown", () => {

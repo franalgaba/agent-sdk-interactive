@@ -1,6 +1,6 @@
 import { describe, expect, test, mock, beforeEach } from "bun:test";
-import { CLI, createCLI } from "./cli";
-import type { CLIConfig, ResolvedConfig } from "./types";
+import { CLI, createCLI } from "../src/cli";
+import type { CLIConfig, ResolvedConfig } from "../src/types";
 
 describe("createCLI", () => {
   test("returns CLI instance", () => {

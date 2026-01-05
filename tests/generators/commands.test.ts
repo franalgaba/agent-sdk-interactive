@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { generateCommandMarkdown, generateCommandFiles } from "./commands";
-import type { CommandDefinition } from "../types";
+import { generateCommandMarkdown, generateCommandFiles } from "../../src/generators/commands";
+import type { CommandDefinition } from "../../src/types";
 
 describe("generateCommandMarkdown", () => {
   test("generates minimal command markdown", () => {

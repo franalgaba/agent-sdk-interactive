@@ -1,8 +1,8 @@
 import { describe, expect, test, beforeEach, afterEach } from "bun:test";
 import * as fs from "fs/promises";
 import * as path from "path";
-import { generatePlugin, cleanupPlugin } from "./plugin";
-import type { ResolvedConfig } from "../types";
+import { generatePlugin, cleanupPlugin } from "../../src/generators/plugin";
+import type { ResolvedConfig } from "../../src/types";
 
 // Test directory
 const TEST_DIR = "/tmp/plugin-test-" + Date.now();

@@ -9,7 +9,7 @@ import {
   McpHttpConfigSchema,
   HookMatcherSchema,
   SettingsSchema,
-} from "./schema";
+} from "../../src/config/schema";
 
 describe("AgentDefinitionSchema", () => {
   test("validates valid agent", () => {

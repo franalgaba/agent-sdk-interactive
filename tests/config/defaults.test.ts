@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { resolveConfig, DEFAULT_CONFIG } from "./defaults";
-import type { CLIConfig } from "../types";
+import { resolveConfig, DEFAULT_CONFIG } from "../../src/config/defaults";
+import type { CLIConfig } from "../../src/types";
 
 describe("DEFAULT_CONFIG", () => {
   test("has correct default name", () => {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createTheme, type TUIThemeConfig, type Theme } from "./theme";
+import { createTheme, type TUIThemeConfig, type Theme } from "../../src/tui/theme";
 
 describe("createTheme", () => {
   test("creates theme with default colors", () => {
