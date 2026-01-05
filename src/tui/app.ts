@@ -17,9 +17,49 @@ import {
   query,
   type SDKMessage,
   type SDKUserMessage,
+  type HookCallbackMatcher,
+  type HookEvent,
 } from "@anthropic-ai/claude-agent-sdk";
-import type { ResolvedConfig, CLIResult } from "../types";
+import type { ResolvedConfig, CLIResult, HookMatcher } from "../types";
 import { createTheme, type Theme, type TUIThemeConfig } from "./theme";
+
+/**
+ * Convert our hook format to SDK's HookCallbackMatcher format
+ */
+function convertHooksToSdkFormat(
+  hooks: Partial<Record<string, HookMatcher[]>>
+): Partial<Record<HookEvent, HookCallbackMatcher[]>> {
+  const result: Partial<Record<HookEvent, HookCallbackMatcher[]>> = {};
+
+  for (const [event, matchers] of Object.entries(hooks)) {
+    if (!matchers) continue;
+
+    const sdkMatchers: HookCallbackMatcher[] = [];
+
+    // Group by matcher pattern
+    const byMatcher = new Map<string | undefined, HookMatcher[]>();
+    for (const m of matchers) {
+      if (!m.handler) continue; // Skip shell command hooks in TUI mode
+      const key = m.matcher;
+      if (!byMatcher.has(key)) byMatcher.set(key, []);
+      byMatcher.get(key)!.push(m);
+    }
+
+    for (const [matcher, items] of byMatcher) {
+      const handlers = items.map(i => i.handler!);
+      sdkMatchers.push({
+        matcher,
+        hooks: handlers,
+      });
+    }
+
+    if (sdkMatchers.length > 0) {
+      result[event as HookEvent] = sdkMatchers;
+    }
+  }
+
+  return result;
+}
 
 export interface TUIAppConfig {
   branding: {
@@ -415,6 +455,9 @@ export class TUIApp {
     this.tui.setFocus(this.editor);
 
     try {
+      // Convert hooks to SDK format
+      const sdkHooks = convertHooksToSdkFormat(this.config.hooks);
+
       // Start SDK streaming
       const result = query({
         prompt: this.messageQueue as AsyncIterable<SDKUserMessage>,
@@ -423,9 +466,18 @@ export class TUIApp {
           cwd: this.config.cwd,
           model: this.config.settings.model,
           maxTurns: this.config.settings.maxTurns,
+          maxThinkingTokens: this.config.settings.maxThinkingTokens,
           permissionMode: this.config.settings.permissionMode,
           systemPrompt: this.config.systemPrompt,
           tools: this.config.tools,
+          agents: this.config.agents,
+          mcpServers: this.config.mcpServers,
+          hooks: sdkHooks,
+          allowedTools: this.config.settings.allowedTools,
+          disallowedTools: this.config.settings.disallowedTools,
+          additionalDirectories: this.config.additionalDirectories,
+          continue: this.config.session.continue,
+          resume: this.config.session.resume,
           abortController: this.abortController,
         },
       });

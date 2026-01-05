@@ -44,14 +44,14 @@ export class CLI {
       // Validate and resolve config
       this.resolvedConfig = this.validateAndResolve();
 
-      // Determine mode
-      const mode = this.userConfig.mode ?? "spawn";
+      // Determine mode - TUI is default
+      const mode = this.userConfig.mode ?? "tui";
 
-      if (mode === "tui" && this.userConfig.tui) {
-        return await this.startTUIMode();
+      if (mode === "spawn") {
+        return await this.startSpawnMode();
       }
 
-      return await this.startSpawnMode();
+      return await this.startTUIMode();
     } finally {
       // Always cleanup plugin on exit
       await this.cleanup();
@@ -85,15 +85,16 @@ export class CLI {
    * Start in TUI mode (custom pi-tui with SDK streaming)
    */
   private async startTUIMode(): Promise<CLIResult> {
-    const tuiConfig = this.userConfig.tui!;
+    const tuiConfig = this.userConfig.tui;
+    const name = this.resolvedConfig!.name;
 
     const appConfig: TUIAppConfig = {
       branding: {
-        name: tuiConfig.branding.name,
-        tagline: tuiConfig.branding.tagline,
-        welcomeMessage: tuiConfig.branding.welcomeMessage,
+        name: tuiConfig?.branding?.name ?? name,
+        tagline: tuiConfig?.branding?.tagline,
+        welcomeMessage: tuiConfig?.branding?.welcomeMessage ?? `Welcome to ${name}. Type /help for commands.`,
       },
-      theme: tuiConfig.theme ? {
+      theme: tuiConfig?.theme ? {
         colors: tuiConfig.theme.colors,
       } : undefined,
     };

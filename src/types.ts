@@ -282,7 +282,7 @@ export interface TUIConfig {
 
 /**
  * Mode for running the CLI
- * - 'spawn': Spawn Claude Code CLI (default, uses native TUI with full features)
- * - 'tui': Use custom TUI with pi-tui framework and SDK streaming
+ * - 'tui': Use custom TUI with pi-tui framework and SDK streaming (default)
+ * - 'spawn': Spawn Claude Code CLI (uses native TUI with full features)
  */
 export type CLIMode = "spawn" | "tui";

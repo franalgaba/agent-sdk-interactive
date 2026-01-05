@@ -451,15 +451,15 @@ await createCLI({
 
 | Mode | Description | Use When |
 |------|-------------|----------|
-| `spawn` (default) | Uses Claude Code's native TUI | You want full Claude Code experience with customizations |
-| `tui` | Custom TUI with pi-tui framework | You want complete control over the interface |
+| `tui` (default) | Custom TUI with pi-tui framework | You want a branded, customizable interface |
+| `spawn` | Uses Claude Code's native TUI | You want full Claude Code experience |
 
 ```typescript
-// Spawn mode (default) - Claude Code TUI with your config
-createCLI({ mode: "spawn", ... });
+// TUI mode (default) - Custom branded interface
+createCLI({ name: "hawk", ... });
 
-// TUI mode - Custom interface
-createCLI({ mode: "tui", tui: { branding: {...} }, ... });
+// Spawn mode - Claude Code's native TUI with your plugins
+createCLI({ mode: "spawn", ... });
 ```
 
 ---
