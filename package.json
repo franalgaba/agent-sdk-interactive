@@ -62,10 +62,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anthropics/claude-code-interactive.git"
+    "url": "git+https://github.com/franalgaba/agent-sdk-interactive.git"
   },
   "bugs": {
-    "url": "https://github.com/anthropics/claude-code-interactive/issues"
+    "url": "https://github.com/franalgaba/agent-sdk-interactive/issues"
   },
-  "homepage": "https://github.com/anthropics/claude-code-interactive#readme"
+  "homepage": "https://github.com/franalgaba/agent-sdk-interactive#readme"
 }
